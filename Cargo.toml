@@ -1,0 +1,18 @@
+[package]
+name = "kabegami"
+version = "0.1.1"
+authors = ["Nadji Abidi <mouhamir2@gmail.com>"]
+edition = "2021"
+description = "Simple Background Setter"
+keywords = ["desktop", "wallpaper", "background"]
+categories = ["api-bindings"]
+repository = "https://github.com/Nadji-abidi/kabegami"
+license = "MIT"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.66"
+infer = "0.11.0"
+rand = "0.8.5"
+thiserror = "1.0.37"
+wall = "0.2.3"

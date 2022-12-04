@@ -12,6 +12,7 @@ license = "MIT"
 
 [dependencies]
 anyhow = "1.0.66"
+dirs = "4.0.0"
 infer = "0.11.0"
 rand = "0.8.5"
 thiserror = "1.0.37"

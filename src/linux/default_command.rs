@@ -12,11 +12,13 @@ const LXQT_SETTER: &[u8] = include_bytes!("./scripts/lxqt_setter.sh");
 const MATE_SETTER: &[u8] = include_bytes!("./scripts/mate_setter.sh");
 const CINNAMON_SETTER: &[u8] = include_bytes!("./scripts/cinnamon_setter.sh");
 
+const CONFIG_ENV_VAR: [&str; 2] = ["HOME", "XDG_CONFIG_HOME"];
+
 fn config_dir() -> Result<PathBuf> {
-    let home_key = "HOME";
-    match std::env::var(home_key) {
-        Ok(home_dir) => Ok(Path::new(&home_dir).join(".config/kabegami")),
-        Err(_e) => Err(Error::EnvError(home_key.to_owned())),
+    let user_config_dir = dirs::config_dir();
+    match user_config_dir {
+        Some(dir) => Ok(dir.join("kabegami")),
+        None => Err(Error::EnvError(CONFIG_ENV_VAR.join(","))),
     }
 }
 

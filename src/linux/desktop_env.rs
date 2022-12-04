@@ -8,6 +8,7 @@ const LXQT_SESSION: &str = "lxqt";
 const LXDE_SESSION: &str = "lxde";
 const MATE_SESSION: &str = "mate";
 const CINNAMON_SESSION: &str = "cinnamon";
+const DESKTOP_SESSION_KEYS: [&str; 2] = ["DESKTOP_SESSION", "XDG_CURRENT_DESKTOP"];
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DesktopEnv {
@@ -45,12 +46,11 @@ impl From<&str> for DesktopEnv {
 
 impl DesktopEnv {
     pub fn get_current() -> Result<Self> {
-        let desktop_session_keys = ["DESKTOP_SESSION", "XDG_CURRENT_DESKTOP"];
-        let desktop_session_values = desktop_session_keys.map(env::var);
+        let desktop_session_values = DESKTOP_SESSION_KEYS.map(env::var);
         desktop_session_values
             .into_iter()
             .find(|env_result| env_result.is_ok())
             .map(|env_var| Self::from(env_var.unwrap().as_str()))
-            .ok_or_else(|| Error::EnvError(desktop_session_keys.join(",")))
+            .ok_or_else(|| Error::EnvError(DESKTOP_SESSION_KEYS.join(",")))
     }
 }

@@ -61,8 +61,8 @@ where
 
 pub fn run_shell<P: AsRef<Path>>(shell_path: P, bg_path: P) -> Result<()> {
     let command_output = Command::new("sh")
-        .arg(shell_path.as_ref().as_os_str())
-        .arg(bg_path.as_ref().as_os_str())
+        .arg(shell_path.as_ref())
+        .arg(bg_path.as_ref())
         .output()?;
     if command_output.status.success() {
         Ok(())

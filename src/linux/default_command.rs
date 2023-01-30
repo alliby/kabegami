@@ -1,8 +1,8 @@
-use crate::error::{Error, Result};
 use crate::linux::desktop_env::DesktopEnv;
-use std::fs;
+use std::{fs, env};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use waraq::error::{Error, Result};
 
 const GNOME_SETTER: &[u8] = include_bytes!("./scripts/gnome_setter.sh");
 const KDE_SETTER: &[u8] = include_bytes!("./scripts/kde_setter.sh");
@@ -12,19 +12,20 @@ const LXQT_SETTER: &[u8] = include_bytes!("./scripts/lxqt_setter.sh");
 const MATE_SETTER: &[u8] = include_bytes!("./scripts/mate_setter.sh");
 const CINNAMON_SETTER: &[u8] = include_bytes!("./scripts/cinnamon_setter.sh");
 
-const CONFIG_ENV_VAR: [&str; 2] = ["HOME", "XDG_CONFIG_HOME"];
-
 fn config_dir() -> Result<PathBuf> {
-    let user_config_dir = dirs::config_dir();
-    match user_config_dir {
-        Some(dir) => Ok(dir.join("kabegami")),
-        None => Err(Error::EnvError(CONFIG_ENV_VAR.join(","))),
+    const HOME_KEY: &str = "HOME";
+    if let Ok(p) = env::var(HOME_KEY) {
+        let path: PathBuf = [&p, ".config", "kabegami"].iter().collect();
+        Ok(path)
+    } else {
+        Err(Error::EnvError(HOME_KEY.into()))
     }
 }
 
 pub fn create_config_dir() -> Result<()> {
     let config_dir = config_dir()?;
-    Ok(fs::create_dir_all(config_dir)?)
+    fs::create_dir_all(config_dir)?;
+    Ok(())
 }
 
 pub fn desktop_config_path(desktop: &DesktopEnv) -> Result<PathBuf> {
@@ -68,6 +69,6 @@ pub fn run_shell<P: AsRef<Path>>(shell_path: P, bg_path: P) -> Result<()> {
         Ok(())
     } else {
         let err_msg = String::from_utf8_lossy(&command_output.stderr);
-        Err(Error::CommandError(err_msg.to_string()))
+        Err(Error::CommandError(err_msg.into()))
     }
 }

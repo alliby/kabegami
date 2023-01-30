@@ -1,12 +1,14 @@
-use rand::thread_rng;
-use std::path::{Path, PathBuf};
-use std::io::Read;
+pub mod error;
+pub mod image_utils;
+
 use rand::prelude::IteratorRandom;
+use rand::thread_rng;
+use image_utils::ImageMode;
+use std::io::Read;
+use std::path::{Path, PathBuf};
 
 #[cfg(target_os = "linux")]
 pub mod linux;
-
-pub mod error;
 
 fn check_for_type<P: AsRef<Path>>(path: P) -> error::Result<bool> {
     let mut f = std::fs::File::open(path)?;
@@ -16,14 +18,14 @@ fn check_for_type<P: AsRef<Path>>(path: P) -> error::Result<bool> {
 }
 
 pub trait Platform {
-    fn set_bg(path: PathBuf) -> error::Result<()>;
+    fn set_bg(path: PathBuf, mode: ImageMode) -> error::Result<()>;
 
-    fn set_random_bg(&self, list_path: impl IteratorRandom<Item=PathBuf>) -> error::Result<()> {
+    fn set_random_bg(paths_list: impl IteratorRandom<Item = PathBuf>, mode: ImageMode) -> error::Result<()> {
         let mut rng = thread_rng();
-        let random_path = list_path
+        let random_path = paths_list
             .filter(|p| matches!(check_for_type(p), Ok(true)))
             .choose(&mut rng)
             .ok_or(error::Error::NoValidFile);
-        Self::set_bg(random_path?)
+        Self::set_bg(random_path?, mode)
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "kabegami"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Nadji Abidi <mouhamir2@gmail.com>"]
 edition = "2021"
 description = "Simple Background Setter"
@@ -11,12 +11,8 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.66"
-dirs = "4.0.0"
-infer = "0.11.0"
-rand = "0.8.5"
-thiserror = "1.0.37"
-wall = { path = "./wall" }
+argh = "0.1.10"
+waraq = { path = "./waraq" }
 
 [profile.release]
 codegen-units = 1

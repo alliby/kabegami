@@ -11,10 +11,12 @@ use x11rb::protocol::xproto::Screen;
 
 #[cfg(target_os = "linux")]
 fn parse_rgb(image: &mut Image, input: RgbImage) {
-    for (x, y, Rgb::<u8>([r, g, b])) in input.enumerate_pixels() {
-        let rgb = ((*r as u32) << 16) | ((*g as u32) << 8) | (*b as u32);
-        image.put_pixel(x as u16, y as u16, rgb);
-    }
+    input
+        .enumerate_pixels()
+        .for_each(|(x, y, Rgb::<u8>([r, g, b]) )| {
+            let rgb = ((*r as u32) << 16) | ((*g as u32) << 8) | (*b as u32);
+            image.put_pixel(x as u16, y as u16, rgb);
+        })
 }
 
 #[cfg(target_os = "linux")]

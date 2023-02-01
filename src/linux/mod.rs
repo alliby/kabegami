@@ -1,7 +1,7 @@
-pub mod default_command;
+pub mod utils;
 pub mod desktop_env;
 
-use default_command::*;
+use utils::*;
 use desktop_env::DesktopEnv;
 use std::path::PathBuf;
 
@@ -30,11 +30,9 @@ impl LinuxEnv {
     }
 
     /// Sets the background using shell commands.
-    /// TODO: add image modes
-    pub fn set_bg_shell(&self, bg_path: PathBuf) -> Result<()> {
-        std::fs::create_dir_all(&self.config_path)?;
-        parse_default_setters(&self.config_path, &self.current_desktop)?;
-        run_shell(&self.config_path, &bg_path)
+    pub fn set_bg_shell(&self, bg_path: PathBuf, mode: ImageMode) -> Result<()> {
+        let copied_path = copy_bg_with_mode(bg_path, mode)?;
+        run_shell(&self.config_path, &copied_path)
     }
     
     /// Sets the background using the XCB library.
@@ -52,9 +50,12 @@ impl Platform for LinuxEnv {
         let env = Self::new()?;
         match (env.config_path.exists(), &env.current_desktop) {
             (false, DesktopEnv::Other) => Self::set_bg_xcb(bg_path, mode),
-            _ => {
-                env.set_bg_shell(bg_path)
-            }
+            (false, _) => {
+                create_config_dir()?;
+                parse_default_setters(&env.config_path, &env.current_desktop)?;
+                env.set_bg_shell(bg_path, mode)
+            },
+            _ => env.set_bg_shell(bg_path, mode)
         }
     }
 

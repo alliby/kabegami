@@ -2,6 +2,9 @@ mod image_modes;
 pub mod image_parser;
 
 use image::DynamicImage;
+use image::ImageFormat;
+use crate::error::Result;
+use std::path::Path;
 
 #[derive(Debug)]
 pub enum ImageMode {
@@ -29,5 +32,12 @@ impl ImageMode {
             Self::Fill => image_modes::fill(image, dim),
             Self::Stretch => image_modes::stretch(image, dim),
         }
+    }
+
+    pub fn apply_with_save(&self, input: &Path, dest: &Path, dim: (u32, u32)) -> Result<()> {
+        let image = image::open(input)?;
+        let img_out = self.apply(image, dim);
+        img_out.save_with_format(dest, ImageFormat::Jpeg)?;
+        Ok(())
     }
 }

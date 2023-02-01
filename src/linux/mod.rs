@@ -19,6 +19,7 @@ pub struct LinuxEnv {
 }
 
 impl LinuxEnv {
+    /// New instance of LinuxEnv with default values
     pub fn new() -> Result<Self> {
         let current_desktop = DesktopEnv::get_current()?;
         let config_path: PathBuf = desktop_config_path(&current_desktop)?;
@@ -31,6 +32,7 @@ impl LinuxEnv {
     /// Sets the background using shell commands.
     /// TODO: add image modes
     pub fn set_bg_shell(&self, bg_path: PathBuf) -> Result<()> {
+        std::fs::create_dir_all(&self.config_path)?;
         parse_default_setters(&self.config_path, &self.current_desktop)?;
         run_shell(&self.config_path, &bg_path)
     }
@@ -44,14 +46,13 @@ impl LinuxEnv {
 impl Platform for LinuxEnv {
     /// Sets the background on a Linux system.
     /// This function check first if the shell script for the current desktop exists 
-    /// and execut it , It use XCB Library instead if the current desktop not supported
+    /// and execut it, It use XCB Library instead if the current desktop not supported
     /// and the `setter.sh` file not exists in the config dir
     fn set_bg(bg_path: PathBuf, mode: ImageMode) -> Result<()> {
         let env = Self::new()?;
         match (env.config_path.exists(), &env.current_desktop) {
             (false, DesktopEnv::Other) => Self::set_bg_xcb(bg_path, mode),
             _ => {
-                create_config_dir()?;
                 env.set_bg_shell(bg_path)
             }
         }

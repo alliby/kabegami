@@ -25,7 +25,7 @@ struct Cli {
     #[argh(positional, arg_name = "PATH")]
     path: PathBuf,
 
-    /// default mode: strim, Available modes: strim, stretch, fill
+    /// default mode: strim, available modes: strim, stretch, fill
     #[argh(option, default = "ImageMode::default()", from_str_fn(modes_str_fn))]
     mode: ImageMode,
 }

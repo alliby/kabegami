@@ -22,12 +22,6 @@ fn config_dir() -> Result<PathBuf> {
     }
 }
 
-pub fn create_config_dir() -> Result<()> {
-    let config_dir = config_dir()?;
-    fs::create_dir_all(config_dir)?;
-    Ok(())
-}
-
 pub fn desktop_config_path(desktop: &DesktopEnv) -> Result<PathBuf> {
     let config_dir = config_dir()?;
     let path = match desktop {

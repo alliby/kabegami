@@ -3,6 +3,8 @@ use std::{fs, env};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use waraq::error::{Error, Result};
+use waraq::image_utils::ImageMode;
+use waraq::linux::xcb::get_display_info;
 
 const GNOME_SETTER: &[u8] = include_bytes!("./scripts/gnome_setter.sh");
 const KDE_SETTER: &[u8] = include_bytes!("./scripts/kde_setter.sh");
@@ -20,6 +22,19 @@ fn config_dir() -> Result<PathBuf> {
     } else {
         Err(Error::EnvError(HOME_KEY.into()))
     }
+}
+
+pub fn create_config_dir() -> Result<()> {
+    let config_dir = config_dir()?;
+    fs::create_dir_all(config_dir)?;
+    Ok(())
+}
+
+pub fn copy_bg_with_mode(bg_path: PathBuf, mode: ImageMode) -> Result<PathBuf> {
+    let config_bg = config_dir()?.join("current");
+    let dim = get_display_info()?;
+    mode.apply_with_save(&bg_path, &config_bg, dim)?;
+    Ok(config_bg)
 }
 
 pub fn desktop_config_path(desktop: &DesktopEnv) -> Result<PathBuf> {

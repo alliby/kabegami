@@ -3,8 +3,10 @@ use image::error::ImageError;
 #[cfg(target_os = "linux")]
 use x11rb::errors::{ConnectError, ConnectionError, ReplyOrIdError};
 
+/// Waraq Main's Result type
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// An Error with the X server connection
 #[cfg(target_os = "linux")]
 #[derive(Debug)]
 pub enum X11Error {
@@ -22,6 +24,7 @@ impl std::fmt::Display for X11Error {
     }
 }
 
+/// Waraq Main's Error Struct
 #[derive(Debug)]
 pub enum Error {
     IoError(std::io::Error),

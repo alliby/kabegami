@@ -26,6 +26,7 @@ impl Default for ImageMode {
 }
 
 impl ImageMode {
+    /// apply the mode to the given Image, it will return another modified image has the same dimentions
     pub fn apply(&self, image: DynamicImage, dim: (u32, u32)) -> DynamicImage {
         match self {
             Self::Strim => image_modes::strim_and_blur(image, dim),
@@ -34,6 +35,8 @@ impl ImageMode {
         }
     }
 
+    /// load the image from the input path, apply the mode and then save the modified image
+    /// to the dest path. It save it to Jpeg format by default
     pub fn apply_with_save(&self, input: &Path, dest: &Path, dim: (u32, u32)) -> Result<()> {
         let image = image::open(input)?;
         let img_out = self.apply(image, dim);

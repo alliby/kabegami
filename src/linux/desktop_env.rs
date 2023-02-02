@@ -55,6 +55,8 @@ impl DesktopEnv {
             .into_iter()
             .find(|env_result| env_result.is_ok())
             .map(|env_var| Self::from(env_var.unwrap().as_str()))
-            .ok_or_else(|| Error::EnvError(DESKTOP_SESSION_KEYS.join(",")))
+            .ok_or_else(|| Error::Other(
+                format!("Environment variables {} Not Found", DESKTOP_SESSION_KEYS.join(","))
+            ))
     }
 }

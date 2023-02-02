@@ -28,10 +28,9 @@ impl std::fmt::Display for X11Error {
 #[derive(Debug)]
 pub enum Error {
     IoError(std::io::Error),
-    EnvError(String),
-    CommandError(String),
     ImgError(image::error::ImageError),
     NoValidFile,
+    Other(String),
     #[cfg(target_os = "linux")]
     XcbError(X11Error),
 }
@@ -42,10 +41,9 @@ impl std::fmt::Display for Error {
             Self::IoError(err) | Self::ImgError(ImageError::IoError(err)) => {
                 write!(f, "Os error: {err}")
             }
-            Self::EnvError(env) => write!(f, "Environment variable {env} Not Found"),
-            Self::CommandError(cmd_err) => write!(f, "Failed to execute command:\n{cmd_err}"),
             Self::ImgError(img_err) => write!(f, "Failed to load image:\n{img_err}"),
             Self::NoValidFile => write!(f, "No valid file found"),
+            Self::Other(err) => write!(f, "{err}"),
             #[cfg(target_os = "linux")]
             Self::XcbError(xcb_err) => write!(f, "Xcb Error:\n{xcb_err}"),
         }

@@ -20,7 +20,7 @@ fn config_dir() -> Result<PathBuf> {
         let path: PathBuf = [&p, ".config", "kabegami"].iter().collect();
         Ok(path)
     } else {
-        Err(Error::EnvError(HOME_KEY.into()))
+        Err(Error::Other(format!("Environment variable {HOME_KEY} Not Found")))
     }
 }
 
@@ -78,6 +78,6 @@ pub fn run_shell<P: AsRef<Path>>(shell_path: P, bg_path: P) -> Result<()> {
         Ok(())
     } else {
         let err_msg = String::from_utf8_lossy(&command_output.stderr);
-        Err(Error::CommandError(err_msg.into()))
+        Err(Error::Other(format!("Failed to execute command:\n{err_msg}")))
     }
 }

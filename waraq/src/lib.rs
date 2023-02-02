@@ -2,15 +2,15 @@
 //! 
 //! - Set a single wallpaper in fill mode in linux
 //! ```rust
-//! use waraq::linux::LinuxEnv
+//! use waraq::linux::xcb
 //!
 //! let path = PathBuf::from("/path/to/wallpaper");
 //! let mode = image_utils::ImageMode::Fill;
-//! LinuxEnv::set_bg(path, mode).unwrap();
+//! xcb::set_bg(path, mode).unwrap();
 //! ```
 //! - Set a random wallpaper in stretch mode
 //! ```rust
-//! use waraq::linux::LinuxEnv
+//! use waraq::linux::xcb
 //!
 //! let paths = vec![
 //!     PathBuf::from("/path/to/wallpaper1"),
@@ -18,7 +18,7 @@
 //!     PathBuf::from("/path/to/wallpaper3"),
 //! ];
 //! let mode = image_utils::ImageMode::Stretch;
-//! LinuxEnv::set_random_bg(paths.into_iter(), mode).unwrap();
+//! xcb::set_random_bg(paths.into_iter(), mode).unwrap();
 //! ```
 /// Contain possible platform and image errors
 pub mod error;

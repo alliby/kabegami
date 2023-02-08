@@ -1,7 +1,7 @@
 mod image_modes;
 pub mod image_parser;
 
-use image::DynamicImage;
+use image::{DynamicImage, RgbImage};
 use image::ImageFormat;
 use crate::error::Result;
 use std::path::Path;
@@ -27,7 +27,7 @@ impl Default for ImageMode {
 
 impl ImageMode {
     /// apply the mode to the given Image, it will return another modified image has the same dimentions
-    pub fn apply(&self, image: DynamicImage, dim: (u32, u32)) -> DynamicImage {
+    pub fn apply(&self, image: DynamicImage, dim: (u32, u32)) -> RgbImage {
         match self {
             Self::Strim => image_modes::strim_and_blur(image, dim),
             Self::Fill => image_modes::fill(image, dim),

@@ -25,24 +25,22 @@ pub fn parse_file(
     screen: &Screen,
     mode: ImageMode,
 ) -> error::Result<Image<'static>> {
-    let (width, height) = (
+    let mut image = Image::allocate(
         screen.width_in_pixels,
         screen.height_in_pixels,
-    );
-
-    let image = image::open(file_name)?;
-    let new_image = mode.apply(image, (width as u32, height as u32));
-    
-    let mut ximage = Image::allocate(
-        width,
-        height,
         ScanlinePad::Pad32,
         screen.root_depth,
         BitsPerPixel::B32,
         ImageOrder::LsbFirst,
     );
+    let (width, height) = (
+        screen.width_in_pixels as u32,
+        screen.height_in_pixels as u32,
+    );
+    let input = image::open(file_name)?;
 
-    parse_rgb(&mut ximage, new_image.into_rgb8());
+    let input = mode.apply(input, (width, height));
+    parse_rgb(&mut image, input);
 
-    Ok(ximage)
+    Ok(image)
 }

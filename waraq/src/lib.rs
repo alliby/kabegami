@@ -8,18 +8,7 @@
 //! let mode = image_utils::ImageMode::Fill;
 //! xcb::set_bg(path, mode).unwrap();
 //! ```
-//! - Set a random wallpaper in stretch mode
-//! ```rust
-//! use waraq::linux::xcb
 //!
-//! let paths = vec![
-//!     PathBuf::from("/path/to/wallpaper1"),
-//!     PathBuf::from("/path/to/wallpaper2"),
-//!     PathBuf::from("/path/to/wallpaper3"),
-//! ];
-//! let mode = image_utils::ImageMode::Stretch;
-//! xcb::set_random_bg(paths.into_iter(), mode).unwrap();
-//! ```
 /// Contain possible platform and image errors
 pub mod error;
 /// Image utilities module

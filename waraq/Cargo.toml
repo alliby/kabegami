@@ -2,6 +2,12 @@
 name = "waraq"
 version = "0.1.0"
 edition = "2021"
+authors = ["Nadji Abidi <mouhamir2@gmail.com>"]
+description = "Library for Setting Wallpapers"
+keywords = ["desktop", "wallpaper", "background"]
+categories = ["api-bindings"]
+repository = "https://github.com/Nadji-abidi/kabegami/tree/main/waraq"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

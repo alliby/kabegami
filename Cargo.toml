@@ -4,10 +4,11 @@ version = "0.2.0"
 authors = ["Nadji Abidi <mouhamir2@gmail.com>"]
 edition = "2021"
 description = "Simple Background Setter"
-keywords = ["desktop", "wallpaper", "background"]
-categories = ["api-bindings"]
+keywords = ["desktop", "wallpaper", "background", "cli"]
+categories = ["Command line utilities"]
 repository = "https://github.com/Nadji-abidi/kabegami"
 license = "MIT"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

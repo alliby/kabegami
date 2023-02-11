@@ -81,10 +81,7 @@ fn create_root_pixmap(
 pub fn get_display_info() -> error::Result<(u32, u32)> {
     let (conn, screen_num) = x11rb::connect(None)?;
     let screen = &conn.setup().roots[screen_num];
-    Ok((
-        screen.width_in_pixels as _,
-        screen.height_in_pixels as _,
-    ))
+    Ok((screen.width_in_pixels as _, screen.height_in_pixels as _))
 }
 
 pub fn set_bg<P: AsRef<Path>>(path: P, mode: ImageMode) -> error::Result<()> {
@@ -100,6 +97,8 @@ pub fn set_bg<P: AsRef<Path>>(path: P, mode: ImageMode) -> error::Result<()> {
     conn.set_close_down_mode(CloseDown::RETAIN_PERMANENT)?;
 
     conn.flush()?;
+
+    conn.free_pixmap(pixmap)?;
 
     Ok(())
 }

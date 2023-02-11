@@ -1,54 +1,61 @@
-use image::imageops::FilterType;
-use image::{ DynamicImage, RgbImage};
+use image::imageops::blur;
+use image::{DynamicImage, RgbImage};
 use image::{GenericImage, GenericImageView};
-use image::Pixel;
+use resize::Pixel;
+use resize::Type;
+use rgb::FromSlice;
 
-pub fn fill(image: DynamicImage, dim: (u32, u32)) -> RgbImage {
-    let (input_width, input_height) = image.dimensions();
-    let x_ratio = (input_width as f32) / (dim.0 as f32);
-    let y_ratio = (input_height as f32) / (dim.1 as f32);
-
-    RgbImage::from_fn(dim.0, dim.1, |x, y| {
-        let x_index = (x as f32 * x_ratio) as u32;
-        let y_index = (y as f32 * y_ratio) as u32;
-        image.get_pixel(x_index, y_index).to_rgb()
-    })
+fn resize(image: &DynamicImage, dim: (usize, usize)) -> RgbImage {
+    let (width, height) = (image.width() as usize, image.height() as usize);
+    let src = image.to_rgb8();
+    if dim == (width, height) {
+        return src;
+    }
+    let mut resizer =
+        resize::new(width, height, dim.0, dim.1, Pixel::RGB8, Type::Triangle).unwrap();
+    let mut dst = RgbImage::new(dim.0 as u32, dim.1 as u32);
+    resizer.resize(src.as_rgb(), dst.as_rgb_mut()).unwrap();
+    dst
 }
 
 pub fn stretch(image: DynamicImage, dim: (u32, u32)) -> RgbImage {
-    let (input_width, input_height) = image.dimensions();
-    let x_ratio = (input_width - 1) as f32 / (dim.0 - 1) as f32;
-    let y_ratio = (input_height - 1) as f32 / (dim.1 - 1) as f32;
+    resize(&image, (dim.0 as usize, dim.1 as usize))
+}
 
-    RgbImage::from_fn(dim.0, dim.1, |x, y| {
-        let x_index = (x as f32 * x_ratio) as u32;
-        let y_index = (y as f32 * y_ratio) as u32;
-        image.get_pixel(x_index, y_index).to_rgb()
-    })
+pub fn fill(image: DynamicImage, dim: (u32, u32)) -> RgbImage {
+    let (w, h) = image.dimensions();
+    let old_ratio = w as f32 / h as f32;
+    let new_ratio = dim.0 as f32 / dim.1 as f32;
+    if old_ratio == new_ratio {
+        return stretch(image, dim);
+    }
+    // (w, h, x, y)
+    let (new_w, new_h) = if old_ratio < new_ratio {
+        (w, (w as f32 / new_ratio).round() as u32)
+    } else {
+        ((h as f32 * new_ratio).round() as u32, h)
+    };
+    let scaled_image = image.crop_imm((w - new_w) / 2, (h - new_h) / 2, new_w, new_h);
+    resize(&scaled_image, (dim.0 as usize, dim.1 as usize))
 }
 
 pub fn strim_and_blur(image: DynamicImage, dim: (u32, u32)) -> RgbImage {
-    let foreground = image.resize(dim.0, dim.1, FilterType::Nearest);
-    let f_dim = foreground.dimensions();
-    if f_dim == dim {
-        return foreground.into_rgb8();
+    let (w, h) = image.dimensions();
+    let old_ratio = w as f32 / h as f32;
+    let new_ratio = dim.0 as f32 / dim.1 as f32;
+    if old_ratio == new_ratio {
+        return stretch(image, dim);
     }
-    let mut background = image
-        .resize_exact(dim.0, dim.1, FilterType::Nearest)
-        .blur(5.0);
-    if f_dim.0 == dim.0 {
-        let height = dim.1;
-        let new_h = f_dim.1;
-        background
-            .copy_from(&foreground, 0, (height - new_h) / 2)
-            .unwrap();
-    } else if f_dim.1 == dim.1 {
-        let width = dim.0;
-        let new_w = f_dim.0;
-        background
-            .copy_from(&foreground, (width - new_w) / 2, 0)
-            .unwrap();
-    }
-    background.into_rgb8()
+    // (w, h, x, y)
+    let (new_w, new_h) = if old_ratio < new_ratio {
+        ((dim.1 as f32 * old_ratio).round() as u32, dim.1)
+    } else {
+        (dim.0, (dim.0 as f32 / old_ratio).round() as u32)
+    };
+    let foreground = resize(&image, (new_w as usize, new_h as usize));
+    let mut background = blur(&stretch(image, dim), 5.0);
+    background
+        .copy_from(&foreground, (dim.0 - new_w) / 2, (dim.1 - new_h) / 2)
+        .unwrap();
+    background
 }
-

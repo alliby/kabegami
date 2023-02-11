@@ -1,5 +1,5 @@
 //! # Examples
-//! 
+//!
 //! - Set a single wallpaper in fill mode in linux
 //! ```rust
 //! use waraq::linux::xcb
@@ -25,9 +25,9 @@ pub mod error;
 /// Image utilities module
 pub mod image_utils;
 
+use image_utils::ImageMode;
 use rand::prelude::IteratorRandom;
 use rand::thread_rng;
-use image_utils::ImageMode;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
@@ -50,7 +50,10 @@ pub trait Platform {
 
     /// sets a random wallpaper from a list of paths to the specified mode.
     /// filters the list to contain only valid image files, and calls the set_bg method.
-    fn set_random_bg(paths_list: impl IteratorRandom<Item = PathBuf>, mode: ImageMode) -> error::Result<()> {
+    fn set_random_bg(
+        paths_list: impl IteratorRandom<Item = PathBuf>,
+        mode: ImageMode,
+    ) -> error::Result<()> {
         let mut rng = thread_rng();
         let random_path = paths_list
             .filter(|p| matches!(check_for_type(p), Ok(true)))

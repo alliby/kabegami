@@ -1,9 +1,9 @@
 mod image_modes;
 pub mod image_parser;
 
-use image::{DynamicImage, RgbImage};
-use image::ImageFormat;
 use crate::error::Result;
+use image::ImageFormat;
+use image::{DynamicImage, RgbImage};
 use std::path::Path;
 
 #[derive(Debug)]

@@ -13,7 +13,7 @@ use x11rb::protocol::xproto::Screen;
 fn parse_rgb(image: &mut Image, input: RgbImage) {
     input
         .enumerate_pixels()
-        .for_each(|(x, y, Rgb::<u8>([r, g, b]) )| {
+        .for_each(|(x, y, Rgb::<u8>([r, g, b]))| {
             let rgb = ((*r as u32) << 16) | ((*g as u32) << 8) | (*b as u32);
             image.put_pixel(x as u16, y as u16, rgb);
         })
@@ -33,13 +33,13 @@ pub fn parse_file(
         BitsPerPixel::B32,
         ImageOrder::LsbFirst,
     );
-    let (width, height) = (
+    let dim = (
         screen.width_in_pixels as u32,
         screen.height_in_pixels as u32,
     );
     let input = image::open(file_name)?;
 
-    let input = mode.apply(input, (width, height));
+    let input = mode.apply(input, dim);
     parse_rgb(&mut image, input);
 
     Ok(image)

@@ -26,22 +26,15 @@ pub enum DesktopEnv {
 
 impl From<&str> for DesktopEnv {
     fn from(session: &str) -> Self {
-        if GNOME_SESSIONS.iter().any(|gnome| session.contains(gnome)) {
-            Self::Gnome
-        } else if KDE_SESSIONS.iter().any(|kde| session.contains(kde)) {
-            Self::Kde
-        } else if XFCE_SESSIONS.iter().any(|xfce| session.contains(xfce)) {
-            Self::Xfce
-        } else if session.contains(LXQT_SESSION) {
-            Self::Lxqt
-        } else if session.contains(LXDE_SESSION) {
-            Self::Lxde
-        } else if session.contains(MATE_SESSION) {
-            Self::Mate
-        } else if session.contains(CINNAMON_SESSION) {
-            Self::Cinnamon
-        } else {
-            Self::Other
+        match session {
+            s if GNOME_SESSIONS.iter().any(|gnome| s.contains(gnome)) => Self::Gnome,
+            s if KDE_SESSIONS.iter().any(|kde| s.contains(kde)) => Self::Kde,
+            s if XFCE_SESSIONS.iter().any(|xfce| s.contains(xfce)) => Self::Xfce,
+            s if s.contains(LXQT_SESSION) => Self::Lxqt,
+            s if s.contains(LXDE_SESSION) => Self::Lxde,
+            s if s.contains(MATE_SESSION) => Self::Mate,
+            s if s.contains(CINNAMON_SESSION) => Self::Cinnamon,
+            _ => Self::Other
         }
     }
 }

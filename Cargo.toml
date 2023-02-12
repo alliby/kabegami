@@ -1,11 +1,11 @@
 [package]
 name = "kabegami"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Nadji Abidi <mouhamir2@gmail.com>"]
 edition = "2021"
 description = "Simple Background Setter"
 keywords = ["desktop", "wallpaper", "background", "cli"]
-categories = ["command line utilities"]
+categories = ["command-line-utilities"]
 repository = "https://github.com/Nadji-abidi/kabegami"
 license = "MIT"
 

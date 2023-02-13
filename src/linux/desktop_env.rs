@@ -34,7 +34,7 @@ impl From<&str> for DesktopEnv {
             s if s.contains(LXDE_SESSION) => Self::Lxde,
             s if s.contains(MATE_SESSION) => Self::Mate,
             s if s.contains(CINNAMON_SESSION) => Self::Cinnamon,
-            _ => Self::Other
+            _ => Self::Other,
         }
     }
 }
@@ -48,8 +48,11 @@ impl DesktopEnv {
             .into_iter()
             .find(|env_result| env_result.is_ok())
             .map(|env_var| Self::from(env_var.unwrap().as_str()))
-            .ok_or_else(|| Error::Other(
-                format!("Environment variables {} Not Found", DESKTOP_SESSION_KEYS.join(","))
-            ))
+            .ok_or_else(|| {
+                Error::Other(format!(
+                    "Environment variables {} Not Found",
+                    DESKTOP_SESSION_KEYS.join(",")
+                ))
+            })
     }
 }

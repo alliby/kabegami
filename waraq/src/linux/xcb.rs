@@ -42,11 +42,12 @@ fn set_atoms(conn: &impl Connection, screen: &Screen, pixmap: u32) -> Result<(),
     Ok(())
 }
 
+// Create root pixmap and return the ids of pixmap and gc
 fn create_root_pixmap(
     conn: &impl Connection,
     screen: &Screen,
     image: &Image,
-) -> Result<u32, ReplyOrIdError> {
+) -> Result<(u32, u32), ReplyOrIdError> {
     let pixmap = conn.generate_id()?;
     let gc = conn.generate_id()?;
     let rectangle = Rectangle {
@@ -74,7 +75,7 @@ fn create_root_pixmap(
     conn.poly_fill_rectangle(pixmap, gc, &[rectangle])?;
     image.put(conn, pixmap, gc, 0, 0)?;
 
-    Ok(pixmap)
+    Ok((pixmap, gc))
 }
 
 // TODO : Add support for multiple monitor
@@ -91,13 +92,14 @@ pub fn set_bg<P: AsRef<Path>>(path: P, mode: ImageMode) -> error::Result<()> {
     // Load the image
     let image = image_parser::parse_file(path.as_ref().as_os_str(), screen, mode)?;
 
-    let pixmap = create_root_pixmap(&conn, screen, &image)?;
+    let (pixmap, gc) = create_root_pixmap(&conn, screen, &image)?;
     set_atoms(&conn, screen, pixmap)?;
 
     conn.set_close_down_mode(CloseDown::RETAIN_PERMANENT)?;
 
     conn.flush()?;
 
+    conn.free_gc(gc)?;
     conn.free_pixmap(pixmap)?;
 
     Ok(())

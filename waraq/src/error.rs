@@ -1,87 +1,28 @@
-use image::error::ImageError;
-
-#[cfg(target_os = "linux")]
-use x11rb::errors::{ConnectError, ConnectionError, ReplyOrIdError};
+use thiserror::Error;
 
 /// Waraq Main's Result type
-pub type Result<T> = std::result::Result<T, Error>;
-
-/// An Error with the X server connection
-#[cfg(target_os = "linux")]
-#[derive(Debug)]
-pub enum X11Error {
-    ConnectError(x11rb::errors::ConnectError),
-    ReplyOrIdError(x11rb::errors::ReplyOrIdError),
-}
-
-#[cfg(target_os = "linux")]
-impl std::fmt::Display for X11Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Self::ConnectError(_err) => write!(f, "Failed to establish connection with X server"),
-            Self::ReplyOrIdError(err) => write!(f, "{err}"),
-        }
-    }
-}
+pub type Result<T> = std::result::Result<T, PlatformError>;
 
 /// Waraq Main's Error Struct
-#[derive(Debug)]
-pub enum Error {
-    IoError(std::io::Error),
-    ImgError(image::error::ImageError),
-    NoValidFile,
-    Other(String),
+#[derive(Error, Debug)]
+pub enum PlatformError {
     #[cfg(target_os = "linux")]
-    XcbError(X11Error),
-}
+    #[error("Failed to establish connection with X server")]
+    ConnectError(#[from] x11rb::errors::ConnectError),
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Self::IoError(err) | Self::ImgError(ImageError::IoError(err)) => {
-                write!(f, "Os error: {err}")
-            }
-            Self::ImgError(img_err) => write!(f, "Failed to load image:\n{img_err}"),
-            Self::NoValidFile => write!(f, "No valid file found"),
-            Self::Other(err) => write!(f, "{err}"),
-            #[cfg(target_os = "linux")]
-            Self::XcbError(xcb_err) => write!(f, "Xcb Error:\n{xcb_err}"),
-        }
-    }
-}
+    #[cfg(target_os = "linux")]
+    #[error("Failed to get Reply Id from X server")]
+    ReplyOrIdError(#[from] x11rb::errors::ReplyOrIdError),
 
-impl From<std::io::Error> for Error {
-    fn from(err: std::io::Error) -> Self {
-        Self::IoError(err)
-    }
-}
+    #[cfg(target_os = "linux")]
+    #[error("Error with X sever connection")]
+    ConnectionError(#[from] x11rb::errors::ConnectionError),
 
-impl From<ImageError> for Error {
-    fn from(err: ImageError) -> Self {
-        Self::ImgError(err)
-    }
-}
+    #[cfg(target_os = "linux")]
+    #[error("Failed to send X server request")]
+    ReplyError(#[from] x11rb::errors::ReplyError),
 
-#[cfg(target_os = "linux")]
-impl From<ReplyOrIdError> for Error {
-    fn from(err: ReplyOrIdError) -> Self {
-        let reply_err = X11Error::ReplyOrIdError(err);
-        Self::XcbError(reply_err)
-    }
-}
-
-#[cfg(target_os = "linux")]
-impl From<ConnectError> for Error {
-    fn from(err: ConnectError) -> Self {
-        let conn_err = X11Error::ConnectError(err);
-        Self::XcbError(conn_err)
-    }
-}
-
-#[cfg(target_os = "linux")]
-impl From<ConnectionError> for Error {
-    fn from(err: ConnectionError) -> Self {
-        let conn_err = X11Error::ReplyOrIdError(ReplyOrIdError::ConnectionError(err));
-        Self::XcbError(conn_err)
-    }
+    #[cfg(target_os = "windows")]
+    #[error("Failed to send X server request")]
+    WindowsError(#[from] std::io::Error),
 }

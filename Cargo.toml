@@ -1,18 +1,24 @@
 [package]
 name = "kabegami"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Nadji Abidi <mouhamir2@gmail.com>"]
 edition = "2021"
 description = "Simple Background Setter"
 keywords = ["desktop", "wallpaper", "background", "cli"]
 categories = ["command-line-utilities"]
-repository = "https://github.com/Nadji-abidi/kabegami"
+repository = "https://github.com/alliby/kabegami"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 argh = "0.1.10"
+anyhow = "1.0"
+image = { version = "0.24.5", default-features = false, features = ["jpeg", "png"] }
+infer = { version = "0.11.0", default-features = false }
+rand = "0.8.5"
+resize = "0.7.4"
+rgb = "0.8.35"
 waraq = { path = "./waraq" }
 
 [profile.release]

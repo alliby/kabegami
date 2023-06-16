@@ -1,44 +1,56 @@
-use argh::FromArgs;
-use std::path::PathBuf;
-use waraq::error;
-use waraq::Platform;
-use waraq::image_utils::ImageMode;
-
+mod cli;
+pub mod image_utils;
 #[cfg(target_os = "linux")]
 mod linux;
+
+use crate::image_utils::ImageMode;
+use anyhow::anyhow;
+use rand::prelude::IteratorRandom;
+use rand::thread_rng;
+use std::io::Read;
+use std::path::Path;
+use std::path::PathBuf;
+
 #[cfg(target_os = "linux")]
 use linux::LinuxEnv as PlatformBackground;
 
-fn modes_str_fn(_value: &str) -> Result<ImageMode, String> {
-    match _value {
-        "strim" => Ok(ImageMode::Strim),
-        "fill" => Ok(ImageMode::Fill),
-        "stretch" => Ok(ImageMode::Stretch),
-        _ => Err(format!("no mode name \"{_value}\""))
+// Check if a file is a valid image file
+fn check_for_type<P: AsRef<Path>>(path: P) -> anyhow::Result<bool> {
+    let mut f = std::fs::File::open(path)?;
+    let mut buff = [0; 4];
+    f.read_exact(&mut buff)?;
+    Ok(infer::is_image(&buff))
+}
+
+/// A trait for setting wallpapers on different platforms
+pub trait Platform {
+    /// Set a specified wallpaper to the specified mode
+    fn set_bg(path: PathBuf, mode: ImageMode) -> anyhow::Result<()>;
+
+    /// sets a random wallpaper from a list of paths to the specified mode.
+    /// filters the list to contain only valid image files, and calls the set_bg method.
+    fn set_random_bg(
+        paths_list: impl IteratorRandom<Item = PathBuf>,
+        mode: ImageMode,
+    ) -> anyhow::Result<()> {
+        let mut rng = thread_rng();
+        let random_path = paths_list
+            .filter(|p| matches!(check_for_type(p), Ok(true)))
+            .choose(&mut rng)
+            .ok_or(anyhow!("No valid image found !"));
+        Self::set_bg(random_path?, mode)
     }
 }
 
-#[derive(FromArgs)]
-/// Simple Background Setter
-struct Cli {
-    /// the path to the images directory or image file
-    #[argh(positional, arg_name = "PATH")]
-    path: PathBuf,
-
-    /// default mode: strim, available modes: strim, stretch, fill
-    #[argh(option, default = "ImageMode::default()", from_str_fn(modes_str_fn))]
-    mode: ImageMode,
-}
-
-fn read_dir(path: PathBuf) -> error::Result<impl Iterator<Item=PathBuf>> {
-    Ok(path.read_dir()?
+fn read_dir(path: PathBuf) -> anyhow::Result<impl Iterator<Item = PathBuf>> {
+    Ok(path
+        .read_dir()?
         .filter_map(|entry_result| entry_result.ok())
-        .map(|dir_entry| dir_entry.path())
-    )
+        .map(|dir_entry| dir_entry.path()))
 }
 
-fn cli_run() -> error::Result<()> {
-    let cli: Cli = argh::from_env();
+fn main() -> anyhow::Result<()> {
+    let cli: cli::Cli = argh::from_env();
     let path = cli.path;
     let mode = cli.mode;
 
@@ -49,11 +61,4 @@ fn cli_run() -> error::Result<()> {
         PlatformBackground::set_bg(path, mode)?;
     }
     Ok(())
-    
-}
-
-fn main() {
-    if let Err(e) = cli_run() {
-        eprintln!("{e}")
-    }
 }

@@ -1,10 +1,10 @@
+use crate::image_utils::ImageMode;
 use crate::linux::desktop_env::DesktopEnv;
-use std::{fs, env};
+use anyhow::Result;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use waraq::error::{Error, Result};
-use waraq::image_utils::ImageMode;
-use waraq::linux::xcb::get_display_info;
+use std::{env, fs};
+use waraq::xcb::get_display_info;
 
 const GNOME_SETTER: &[u8] = include_bytes!("./scripts/gnome_setter.sh");
 const KDE_SETTER: &[u8] = include_bytes!("./scripts/kde_setter.sh");
@@ -20,7 +20,10 @@ fn config_dir() -> Result<PathBuf> {
         let path: PathBuf = [&p, ".config", "kabegami"].iter().collect();
         Ok(path)
     } else {
-        Err(Error::Other(format!("Environment variable {HOME_KEY} Not Found")))
+        Err(anyhow::anyhow!(
+            "Environment variable {} Not Found",
+            HOME_KEY
+        ))
     }
 }
 
@@ -78,6 +81,6 @@ pub fn run_shell<P: AsRef<Path>>(shell_path: P, bg_path: P) -> Result<()> {
         Ok(())
     } else {
         let err_msg = String::from_utf8_lossy(&command_output.stderr);
-        Err(Error::Other(format!("Failed to execute command:\n{err_msg}")))
+        Err(anyhow::anyhow!("Failed to execute command:\n{err_msg}"))
     }
 }

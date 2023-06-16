@@ -1,5 +1,5 @@
+use anyhow::Result;
 use std::env;
-use waraq::error::{Error, Result};
 
 // Constants for different desktop environments
 const GNOME_SESSIONS: [&str; 5] = ["pantheon", "gnome", "ubuntu", "deepin", "pop"];
@@ -48,11 +48,9 @@ impl DesktopEnv {
             .into_iter()
             .find(|env_result| env_result.is_ok())
             .map(|env_var| Self::from(env_var.unwrap().as_str()))
-            .ok_or_else(|| {
-                Error::Other(format!(
-                    "Environment variables {} Not Found",
-                    DESKTOP_SESSION_KEYS.join(",")
-                ))
-            })
+            .ok_or(anyhow::anyhow!(
+                "Environment variables {} Not Found",
+                DESKTOP_SESSION_KEYS.join(",")
+            ))
     }
 }

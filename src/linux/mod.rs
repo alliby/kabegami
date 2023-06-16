@@ -1,14 +1,12 @@
-pub mod utils;
 pub mod desktop_env;
+pub mod utils;
 
-use utils::*;
+use crate::{ImageMode, Platform};
+use anyhow::Result;
 use desktop_env::DesktopEnv;
 use std::path::PathBuf;
-
-use waraq::error::Result;
-use waraq::image_utils::ImageMode;
-use waraq::linux::xcb;
-use waraq::Platform;
+use utils::*;
+use waraq::xcb::{self, get_display_info};
 
 /// The Linux struct, used for setting the background on Linux systems.
 pub struct LinuxEnv {
@@ -34,16 +32,19 @@ impl LinuxEnv {
         let copied_path = copy_bg_with_mode(bg_path, mode)?;
         run_shell(&self.config_path, &copied_path)
     }
-    
-    /// Sets the background using the XCB library.
+
+    /// Sets the background using XCB.
     pub fn set_bg_xcb(bg_path: PathBuf, mode: ImageMode) -> Result<()> {
-        xcb::set_bg(bg_path, mode)
+        let image = image::open(bg_path)?;
+        let dim = get_display_info()?;
+        let resized_image = mode.apply(image, dim);
+        Ok(xcb::set_bg(resized_image)?)
     }
 }
 
 impl Platform for LinuxEnv {
     /// Sets the background on a Linux system.
-    /// This function check first if the shell script for the current desktop exists 
+    /// This function check first if the shell script for the current desktop exists
     /// and execut it, It use XCB Library instead if the current desktop not supported
     /// and the `setter.sh` file not exists in the config dir
     fn set_bg(bg_path: PathBuf, mode: ImageMode) -> Result<()> {
@@ -54,9 +55,8 @@ impl Platform for LinuxEnv {
                 create_config_dir()?;
                 parse_default_setters(&env.config_path, &env.current_desktop)?;
                 env.set_bg_shell(bg_path, mode)
-            },
-            _ => env.set_bg_shell(bg_path, mode)
+            }
+            _ => env.set_bg_shell(bg_path, mode),
         }
     }
-
 }

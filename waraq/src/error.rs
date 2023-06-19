@@ -22,6 +22,10 @@ pub enum PlatformError {
     #[error("Failed to send X server request")]
     ReplyError(#[from] x11rb::errors::ReplyError),
 
+    #[cfg(target_os = "linux")]
+    #[error("Error while parsing image")]
+    ParseError(#[from] x11rb::rust_connection::ParseError),
+
     #[cfg(target_os = "windows")]
     #[error("Failed to send X server request")]
     WindowsError(#[from] std::io::Error),

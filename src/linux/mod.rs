@@ -38,7 +38,7 @@ impl LinuxEnv {
         let image = image::open(bg_path)?;
         let dim = get_display_info()?;
         let resized_image = mode.apply(image, dim);
-        Ok(xcb::set_bg(resized_image)?)
+        Ok(xcb::set_bg(resized_image.as_raw())?)
     }
 }
 

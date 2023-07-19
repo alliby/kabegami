@@ -15,7 +15,7 @@ use std::path::PathBuf;
 use linux::LinuxEnv as PlatformBackground;
 
 // Check if a file is a valid image file
-fn check_for_type<P: AsRef<Path>>(path: P) -> anyhow::Result<bool> {
+fn is_image<P: AsRef<Path>>(path: P) -> anyhow::Result<bool> {
     let mut f = std::fs::File::open(path)?;
     let mut buff = [0; 4];
     f.read_exact(&mut buff)?;
@@ -35,7 +35,7 @@ pub trait Platform {
     ) -> anyhow::Result<()> {
         let mut rng = thread_rng();
         let random_path = paths_list
-            .filter(|p| matches!(check_for_type(p), Ok(true)))
+            .filter(|p| matches!(is_image(p), Ok(true)))
             .choose(&mut rng)
             .ok_or(anyhow!("No valid image found !"));
         Self::set_bg(random_path?, mode)

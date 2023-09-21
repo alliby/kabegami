@@ -6,7 +6,7 @@ use anyhow::Result;
 use desktop_env::DesktopEnv;
 use std::path::PathBuf;
 use utils::*;
-use waraq::xcb::{self, get_display_info};
+use waraq::{set_bg, get_screen_dimensions};
 
 /// The Linux struct, used for setting the background on Linux systems.
 pub struct LinuxEnv {
@@ -36,7 +36,7 @@ impl LinuxEnv {
     /// Sets the background using XCB.
     pub fn set_bg_xcb(bg_path: PathBuf, mode: ImageMode) -> Result<()> {
         let image = image::open(bg_path)?;
-        let dim = get_display_info()?;
+        let dim = get_screen_dimensions()?;
         let resized_image = mode.apply(image, dim);
         Ok(xcb::set_bg(resized_image.as_raw())?)
     }

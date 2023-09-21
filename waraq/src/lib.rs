@@ -2,7 +2,11 @@
 mod error;
 
 #[cfg(target_os = "linux")]
-pub mod xcb;
+mod xcb;
+#[cfg(target_os = "linux")]
+pub use xcb::*;
 
 #[cfg(target_os = "windows")]
-pub mod windows_api;
+mod windows_api;
+#[cfg(target_os = "windows")]
+pub use windows_api::*;

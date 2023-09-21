@@ -3,7 +3,7 @@ mod xcb;
 
 use crate::error;
 use x11rb::connection::Connection;
-pub use xcb::get_display_info;
+pub use xcb::get_screen_dimensions;
 
 pub fn set_bg(image_data: &[u8]) -> error::Result<()> {
     let (conn, screen_num) = x11rb::connect(None)?;

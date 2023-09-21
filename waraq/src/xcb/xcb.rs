@@ -74,7 +74,7 @@ fn create_root_pixmap(
 }
 
 // TODO : Add support for multiple monitor
-pub fn get_display_info() -> Result<(u32, u32)> {
+pub fn get_screen_dimensions() -> Result<(u32, u32)> {
     let (conn, screen_num) = x11rb::connect(None)?;
     let screen = &conn.setup().roots[screen_num];
     Ok((screen.width_in_pixels as _, screen.height_in_pixels as _))

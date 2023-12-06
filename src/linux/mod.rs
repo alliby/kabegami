@@ -1,7 +1,7 @@
 pub mod desktop_env;
 pub mod utils;
 
-use crate::{ImageMode, Platform};
+use crate::{PaperMode, PaperSetter};
 use anyhow::Result;
 use desktop_env::DesktopEnv;
 use std::path::PathBuf;
@@ -19,7 +19,7 @@ pub struct LinuxEnv {
 impl LinuxEnv {
     /// New instance of LinuxEnv with default values
     pub fn new() -> Result<Self> {
-        let current_desktop = DesktopEnv::get_current()?;
+        let current_desktop = DesktopEnv::get_current();
         let config_path: PathBuf = desktop_config_path(&current_desktop)?;
         Ok(Self {
             current_desktop,
@@ -28,13 +28,13 @@ impl LinuxEnv {
     }
 
     /// Sets the background using shell commands.
-    pub fn set_bg_shell(&self, bg_path: PathBuf, mode: ImageMode) -> Result<()> {
+    pub fn set_bg_shell(&self, bg_path: PathBuf, mode: PaperMode) -> Result<()> {
         let copied_path = copy_bg_with_mode(bg_path, mode)?;
         run_shell(&self.config_path, &copied_path)
     }
 
     /// Sets the background using XCB.
-    pub fn set_bg_xcb(bg_path: PathBuf, mode: ImageMode) -> Result<()> {
+    pub fn set_bg_xcb(bg_path: PathBuf, mode: PaperMode) -> Result<()> {
         let image = image::open(bg_path)?;
         let dim = get_screen_dimensions()?;
         let resized_image = mode.apply(image, dim);
@@ -42,12 +42,12 @@ impl LinuxEnv {
     }
 }
 
-impl Platform for LinuxEnv {
+impl PaperSetter for LinuxEnv {
     /// Sets the background on a Linux system.
     /// This function check first if the shell script for the current desktop exists
     /// and execut it, It use XCB Library instead if the current desktop not supported
     /// and the `setter.sh` file not exists in the config dir
-    fn set_bg(bg_path: PathBuf, mode: ImageMode) -> Result<()> {
+    fn set_bg(bg_path: PathBuf, mode: PaperMode) -> Result<()> {
         let env = Self::new()?;
         match (env.config_path.exists(), &env.current_desktop) {
             (false, DesktopEnv::Other) => Self::set_bg_xcb(bg_path, mode),

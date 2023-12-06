@@ -1,12 +1,12 @@
-use crate::image_utils::ImageMode;
+use crate::image_utils::PaperMode;
 use argh::FromArgs;
 use std::path::PathBuf;
 
-fn modes_str_fn(_value: &str) -> Result<ImageMode, String> {
+fn modes_str_fn(_value: &str) -> Result<PaperMode, String> {
     match _value {
-        "strim" => Ok(ImageMode::Strim),
-        "fill" => Ok(ImageMode::Fill),
-        "stretch" => Ok(ImageMode::Stretch),
+        "strim" => Ok(PaperMode::Strim),
+        "fill" => Ok(PaperMode::Fill),
+        "stretch" => Ok(PaperMode::Stretch),
         _ => Err(format!("no mode name \"{}\"", _value)),
     }
 }
@@ -19,6 +19,6 @@ pub struct Cli {
     pub path: PathBuf,
 
     /// default mode: strim, available modes: strim, stretch, fill
-    #[argh(option, default = "ImageMode::default()", from_str_fn(modes_str_fn))]
-    pub mode: ImageMode,
+    #[argh(option, default = "PaperMode::default()", from_str_fn(modes_str_fn))]
+    pub mode: PaperMode,
 }

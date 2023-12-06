@@ -1,7 +1,7 @@
 pub mod desktop_env;
 pub mod utils;
 
-use crate::{PaperMode, Platform};
+use crate::{PaperMode, PaperSetter};
 use anyhow::Result;
 use desktop_env::DesktopEnv;
 use std::path::PathBuf;
@@ -42,7 +42,7 @@ impl LinuxEnv {
     }
 }
 
-impl Platform for LinuxEnv {
+impl PaperSetter for LinuxEnv {
     /// Sets the background on a Linux system.
     /// This function check first if the shell script for the current desktop exists
     /// and execut it, It use XCB Library instead if the current desktop not supported

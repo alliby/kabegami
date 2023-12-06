@@ -19,7 +19,7 @@ pub struct LinuxEnv {
 impl LinuxEnv {
     /// New instance of LinuxEnv with default values
     pub fn new() -> Result<Self> {
-        let current_desktop = DesktopEnv::get_current()?;
+        let current_desktop = DesktopEnv::get_current();
         let config_path: PathBuf = desktop_config_path(&current_desktop)?;
         Ok(Self {
             current_desktop,

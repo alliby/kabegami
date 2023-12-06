@@ -1,4 +1,3 @@
-use anyhow::Result;
 use std::env;
 
 // Constants for different desktop environments
@@ -12,7 +11,7 @@ const CINNAMON_SESSION: &str = "cinnamon";
 const DESKTOP_SESSION_KEYS: [&str; 2] = ["DESKTOP_SESSION", "XDG_CURRENT_DESKTOP"];
 
 /// Enum represent the different desktop environments supported
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Default)]
 pub enum DesktopEnv {
     Gnome,
     Kde,
@@ -21,12 +20,13 @@ pub enum DesktopEnv {
     Lxqt,
     Mate,
     Cinnamon,
+    #[default]
     Other,
 }
 
-impl From<&str> for DesktopEnv {
-    fn from(session: &str) -> Self {
-        match session {
+impl<S: AsRef<str>> From<S> for DesktopEnv {
+    fn from(session: S) -> Self {
+        match session.as_ref() {
             s if GNOME_SESSIONS.iter().any(|gnome| s.contains(gnome)) => Self::Gnome,
             s if KDE_SESSIONS.iter().any(|kde| s.contains(kde)) => Self::Kde,
             s if XFCE_SESSIONS.iter().any(|xfce| s.contains(xfce)) => Self::Xfce,
@@ -41,16 +41,12 @@ impl From<&str> for DesktopEnv {
 
 impl DesktopEnv {
     /// get the current desktop environment by iterating over the environment variable keys
-    /// Returning an error if no key has a value
-    pub fn get_current() -> Result<Self> {
-        let desktop_session_values = DESKTOP_SESSION_KEYS.map(env::var);
-        desktop_session_values
+    /// Returning default `Desktop::Other` if no key has a value
+    pub fn get_current() -> Self {
+        DESKTOP_SESSION_KEYS
             .into_iter()
-            .find(|env_result| env_result.is_ok())
-            .map(|env_var| Self::from(env_var.unwrap().as_str()))
-            .ok_or(anyhow::anyhow!(
-                "Environment variables {} Not Found",
-                DESKTOP_SESSION_KEYS.join(",")
-            ))
+            .find_map(|env_key| env::var(env_key).ok())
+            .map(Self::from)
+            .unwrap_or_default()
     }
 }

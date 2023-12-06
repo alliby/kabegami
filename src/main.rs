@@ -3,7 +3,7 @@ pub mod image_utils;
 #[cfg(target_os = "linux")]
 mod linux;
 
-use crate::image_utils::ImageMode;
+use crate::image_utils::PaperMode;
 use anyhow::anyhow;
 use rand::prelude::IteratorRandom;
 use rand::thread_rng;
@@ -23,15 +23,15 @@ fn is_image<P: AsRef<Path>>(path: P) -> anyhow::Result<bool> {
 }
 
 /// A trait for setting wallpapers on different platforms
-pub trait Platform {
+pub trait PaperSetter {
     /// Set a specified wallpaper to the specified mode
-    fn set_bg(path: PathBuf, mode: ImageMode) -> anyhow::Result<()>;
+    fn set_bg(path: PathBuf, mode: PaperMode) -> anyhow::Result<()>;
 
     /// sets a random wallpaper from a list of paths to the specified mode.
     /// filters the list to contain only valid image files, and calls the set_bg method.
     fn set_random_bg(
         paths_list: impl IteratorRandom<Item = PathBuf>,
-        mode: ImageMode,
+        mode: PaperMode,
     ) -> anyhow::Result<()> {
         let mut rng = thread_rng();
         let random_path = paths_list

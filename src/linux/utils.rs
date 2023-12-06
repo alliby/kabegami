@@ -1,4 +1,4 @@
-use crate::image_utils::ImageMode;
+use crate::image_utils::PaperMode;
 use crate::linux::desktop_env::DesktopEnv;
 use anyhow::Result;
 use std::path::{Path, PathBuf};
@@ -33,7 +33,7 @@ pub fn create_config_dir() -> Result<()> {
     Ok(())
 }
 
-pub fn copy_bg_with_mode(bg_path: PathBuf, mode: ImageMode) -> Result<PathBuf> {
+pub fn copy_bg_with_mode(bg_path: PathBuf, mode: PaperMode) -> Result<PathBuf> {
     let config_bg = config_dir()?.join("current");
     let dim = get_display_info()?;
     mode.apply_with_save(&bg_path, &config_bg, dim)?;

@@ -4,7 +4,7 @@ use image::{DynamicImage, RgbImage};
 use std::path::Path;
 
 #[derive(Debug, Default)]
-pub enum ImageMode {
+pub enum PaperMode {
     /// This mode stretches and blur the image to fit the entire screen,
     /// and then add a scaled image on top of it
     #[default]
@@ -17,7 +17,7 @@ pub enum ImageMode {
     Fill,
 }
 
-impl ImageMode {
+impl PaperMode {
     /// apply the mode to the given Image, it will return another modified image has the same dimentions
     pub fn apply(&self, image: DynamicImage, dim: (u32, u32)) -> RgbImage {
         match self {

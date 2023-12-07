@@ -1,9 +1,9 @@
 use thiserror::Error;
 
-/// Waraq Main's Result type
+/// Kabegami Main's Result type
 pub type Result<T> = std::result::Result<T, PlatformError>;
 
-/// Waraq Main's Error Struct
+/// Kabegami Main's Error Struct
 #[derive(Error, Debug)]
 pub enum PlatformError {
     #[cfg(target_os = "linux")]

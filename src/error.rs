@@ -34,5 +34,8 @@ pub enum PlatformError {
     ImageError(#[from] image::error::ImageError),
 
     #[error("{0}")]
-    IoError(#[from] std::io::Error)
+    IoError(#[from] std::io::Error),
+
+    #[error("No valid image found in this directory")]
+    InvalidDirectory,
 }

@@ -45,7 +45,7 @@ pub trait PaperSetter {
         let random_path = paths_list
             .filter(|path| is_image(path))
             .choose(&mut rng)
-            .unwrap();
+            .ok_or(error::PlatformError::InvalidDirectory)?;
         Self::set_wallpaper(random_path, mode)
     }
 }

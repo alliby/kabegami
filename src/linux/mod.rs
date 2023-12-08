@@ -11,16 +11,14 @@ use std::process::Command;
 const DEFAULT_WALLPAPER_NAME: &str = "current";
 
 pub fn run_script<P: AsRef<Path>>(script_path: P, wallpaper_path: P) -> Result<()> {
-    let _command_output = Command::new("sh")
+    let command_status = Command::new("sh")
         .arg(script_path.as_ref())
         .arg(wallpaper_path.as_ref())
-        .output()?;
-    // if command_output.status.success() {
-    //     Ok(())
-    // } else {
-    //     let err_msg = String::from_utf8_lossy(&command_output.stderr);
-    //     Err(anyhow::anyhow!("Failed to execute command:\n{err_msg}"))
-    // }
+        .status()?;
+    match command_status.code() {
+        Some(code) => println!("Exited with status code: {code}"),
+        None => println!("Process terminated by signal")
+    }
     Ok(())
 }
 

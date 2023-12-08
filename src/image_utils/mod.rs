@@ -1,43 +1,24 @@
 mod image_modes;
+
+use crate::PaperMode;
 use image::ImageFormat;
 use image::{DynamicImage, RgbImage};
+use image::error::ImageResult;
 use std::path::Path;
 
-#[derive(Debug, Default)]
-pub enum PaperMode {
-    /// This mode stretches and blur the image to fit the entire screen,
-    /// and then add a scaled image on top of it
-    #[default]
-    Strim,
-    /// This mode stretches the image to fit the entire screen, regardless of its aspect ratio.
-    /// This is useful when the image is smaller than the screen resolution.
-    Stretch,
-    /// This mode fills the entire screen with the image, preserve the image ratio and cropping it if necessary.
-    /// It is useful when you want to cover the entire screen with the image.
-    Fill,
+pub fn resize_image(image: DynamicImage, mode: PaperMode, dim: (u32, u32)) -> RgbImage {
+    match mode {
+        PaperMode::Strim => image_modes::strim_and_blur(image, dim),
+        PaperMode::Fill => image_modes::fill(image, dim),
+        PaperMode::Stretch => image_modes::stretch(image, dim),
+    }
 }
 
-impl PaperMode {
-    /// apply the mode to the given Image, it will return another modified image has the same dimentions
-    pub fn apply(&self, image: DynamicImage, dim: (u32, u32)) -> RgbImage {
-        match self {
-            Self::Strim => image_modes::strim_and_blur(image, dim),
-            Self::Fill => image_modes::fill(image, dim),
-            Self::Stretch => image_modes::stretch(image, dim),
-        }
-    }
-
-    /// load the image from the input path, apply the mode and then save the modified image
-    /// to the dest path. It save it to Jpeg format by default
-    pub fn apply_with_save(
-        &self,
-        input: &Path,
-        dest: &Path,
-        dim: (u32, u32),
-    ) -> anyhow::Result<()> {
-        let image = image::open(input)?;
-        let img_out = self.apply(image, dim);
-        img_out.save_with_format(dest, ImageFormat::Jpeg)?;
-        Ok(())
-    }
+/// load the image from the input path, apply the mode and then save the modified image
+/// to the dest path. It save it to Jpeg format by default
+pub fn save_image<P: AsRef<Path>>(source: P, dest: P, mode: PaperMode, dim: (u32, u32)) -> ImageResult<()> {
+    let image = image::open(source)?;
+    let img_out = resize_image(image, mode, dim);
+    img_out.save_with_format(dest, ImageFormat::Jpeg)?;
+    Ok(())
 }

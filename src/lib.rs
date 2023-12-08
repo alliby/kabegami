@@ -36,7 +36,6 @@ pub trait PaperSetter {
     fn set_wallpaper(path: PathBuf, mode: PaperMode) -> error::Result<()>;
 
     /// sets a random wallpaper from a list of paths to the specified mode.
-    /// filters the list to contain only valid image files, and calls the set_bg method.
     fn set_random_wallpaper(
         paths_list: impl IteratorRandom<Item = PathBuf>,
         mode: PaperMode,

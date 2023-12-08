@@ -1,65 +1,52 @@
-mod cli;
-pub mod image_utils;
+use kabegami::{PaperMode, PaperSetter};
+use kabegami::error;
+use std::path::PathBuf;
+use argh::FromArgs;
+
 #[cfg(target_os = "linux")]
 mod linux;
 
-use crate::image_utils::PaperMode;
-use anyhow::anyhow;
-use rand::prelude::IteratorRandom;
-use rand::thread_rng;
-use std::io::Read;
-use std::path::Path;
-use std::path::PathBuf;
-
 #[cfg(target_os = "linux")]
-use linux::LinuxEnv as PlatformBackground;
+use linux::LinuxSetter as PlatformSetter;
 
-// Check if a file is a valid image file
-fn is_image<P: AsRef<Path>>(path: P) -> bool {
-    let mut buff = [0; 4];
-    std::fs::File::open(path)
-        .and_then(|mut file| file.read_exact(&mut buff))
-        .map(|_| infer::is_image(&buff))
-        .unwrap_or(false)
-}
-
-/// A trait for setting wallpapers on different platforms
-pub trait PaperSetter {
-    /// Set a specified wallpaper to the specified mode
-    fn set_bg(path: PathBuf, mode: PaperMode) -> anyhow::Result<()>;
-
-    /// sets a random wallpaper from a list of paths to the specified mode.
-    /// filters the list to contain only valid image files, and calls the set_bg method.
-    fn set_random_bg(
-        paths_list: impl IteratorRandom<Item = PathBuf>,
-        mode: PaperMode,
-    ) -> anyhow::Result<()> {
-        let mut rng = thread_rng();
-        let random_path = paths_list
-            .filter(|path| is_image(path))
-            .choose(&mut rng)
-            .ok_or(anyhow!("No valid image found !"));
-        Self::set_bg(random_path?, mode)
+fn modes_str_fn(_value: &str) -> Result<PaperMode, String> {
+    match _value {
+        "strim" => Ok(PaperMode::Strim),
+        "fill" => Ok(PaperMode::Fill),
+        "stretch" => Ok(PaperMode::Stretch),
+        _ => Err(format!("no mode with name `{}`", _value)),
     }
 }
 
-fn read_dir(path: PathBuf) -> anyhow::Result<impl Iterator<Item = PathBuf>> {
+#[derive(FromArgs)]
+/// Simple Background Setter
+pub struct Cli {
+    /// the path to the images directory or image file
+    #[argh(positional, arg_name = "PATH")]
+    pub path: PathBuf,
+
+    /// default mode: strim, available modes: strim, stretch, fill
+    #[argh(option, default = "PaperMode::default()", from_str_fn(modes_str_fn))]
+    pub mode: PaperMode,
+}
+
+fn read_dir(path: PathBuf) -> error::Result<impl Iterator<Item = PathBuf>> {
     Ok(path
         .read_dir()?
         .filter_map(|entry_result| entry_result.ok())
         .map(|dir_entry| dir_entry.path()))
 }
 
-fn main() -> anyhow::Result<()> {
-    let cli: cli::Cli = argh::from_env();
+fn main() -> error::Result<()> {
+    let cli: Cli = argh::from_env();
     let path = cli.path;
     let mode = cli.mode;
 
     if path.is_dir() {
         let dir_paths = read_dir(path)?;
-        PlatformBackground::set_random_bg(dir_paths, mode)?;
+        PlatformSetter::set_random_wallpaper(dir_paths, mode)?;
     } else {
-        PlatformBackground::set_bg(path, mode)?;
+        PlatformSetter::set_wallpaper(path, mode)?;
     }
     Ok(())
 }

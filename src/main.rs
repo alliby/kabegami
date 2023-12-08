@@ -37,16 +37,21 @@ fn read_dir(path: PathBuf) -> error::Result<impl Iterator<Item = PathBuf>> {
         .map(|dir_entry| dir_entry.path()))
 }
 
-fn main() -> error::Result<()> {
+fn run() -> error::Result<()> {
     let cli: Cli = argh::from_env();
     let path = cli.path;
     let mode = cli.mode;
 
     if path.is_dir() {
         let dir_paths = read_dir(path)?;
-        PlatformSetter::set_random_wallpaper(dir_paths, mode)?;
+        PlatformSetter::set_random_wallpaper(dir_paths, mode)
     } else {
-        PlatformSetter::set_wallpaper(path, mode)?;
+        PlatformSetter::set_wallpaper(path, mode)
     }
-    Ok(())
+}
+
+fn main() {
+    if let Err(err_msg) = run() {
+        eprintln!("{err_msg}")
+    }
 }

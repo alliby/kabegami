@@ -7,7 +7,7 @@ use rand::thread_rng;
 use std::path::{Path, PathBuf};
 use std::io::Read;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub enum PaperMode {
     /// This mode stretches and blur the image to fit the entire screen,
     /// and then add a scaled image on top of it

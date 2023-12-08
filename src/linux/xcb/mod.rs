@@ -1,4 +1,7 @@
-use crate::error::Result;
+mod image_parser;
+
+use kabegami::error::Result;
+use kabegami::PaperMode;
 use x11rb::connection::Connection;
 use x11rb::image::Image;
 use x11rb::protocol::xproto::{
@@ -6,6 +9,7 @@ use x11rb::protocol::xproto::{
     Rectangle, Screen,
 };
 use x11rb::wrapper::ConnectionExt as _;
+use std::path::Path;
 
 x11rb::atom_manager! {
     Atoms: AtomsCookie {
@@ -74,15 +78,18 @@ fn create_root_pixmap(
 }
 
 // TODO : Add support for multiple monitor
-pub fn get_display_info() -> Result<(u32, u32)> {
+pub fn screen_dimensions() -> Result<(u32, u32)> {
     let (conn, screen_num) = x11rb::connect(None)?;
     let screen = &conn.setup().roots[screen_num];
     Ok((screen.width_in_pixels as _, screen.height_in_pixels as _))
 }
 
-pub fn set_bg_native(conn: &impl Connection, screen: &Screen, image: Image) -> Result<()> {
-    let (pixmap, gc) = create_root_pixmap(conn, screen, &image)?;
-    set_atoms(conn, screen, pixmap)?;
+pub fn set_wallpaper<P: AsRef<Path>>(wallpaper_path: P, mode: PaperMode) -> Result<()> {
+    let (conn, screen_num) = x11rb::connect(None)?;
+    let screen = &conn.setup().roots[screen_num];
+    let native_image = image_parser::parse_file(wallpaper_path, screen, mode)?;
+    let (pixmap, gc) = create_root_pixmap(&conn, screen, &native_image)?;
+    set_atoms(&conn, screen, pixmap)?;
     conn.set_close_down_mode(CloseDown::RETAIN_PERMANENT)?;
     conn.flush()?;
     conn.free_gc(gc)?;

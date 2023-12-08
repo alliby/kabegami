@@ -35,17 +35,9 @@ Positional arguments:
 
 Options:
   -h, --help            display this help and exit
-  -m, --mode MODE       default mode: strim, available modes: strim, stretch, fill (default: strim)
+  -m, --mode MODE       default mode: strim, available modes: strim, stretch, fill
 
 ```
-
-## Cross-Platform Support
-
-Kabegami has been tested on Xfce and Bspw. Support for other platforms can be added as needed.
-
-## Customization
-
-Kabegami creates a config file in the path `$HOME/.config/kabegami` in the supported desktop environments. The file is named based on the current desktop environment and can be edited for customization.
 
 ## Contributing
 

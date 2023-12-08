@@ -31,5 +31,8 @@ pub enum PlatformError {
     WindowsError(#[from] windows::core::Error),
     
     #[error("Image Error : {0}")]
-    ImageError(#[from] image::error::ImageError)
+    ImageError(#[from] image::error::ImageError),
+
+    #[error("{0}")]
+    IoError(#[from] std::io::Error)
 }

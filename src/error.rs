@@ -1,9 +1,9 @@
 use thiserror::Error;
 
-/// Waraq Main's Result type
+/// Kabegami Main's Result type
 pub type Result<T> = std::result::Result<T, PlatformError>;
 
-/// Waraq Main's Error Struct
+/// Kabegami Main's Error Struct
 #[derive(Error, Debug)]
 pub enum PlatformError {
     #[cfg(target_os = "linux")]
@@ -27,6 +27,15 @@ pub enum PlatformError {
     ParseError(#[from] x11rb::rust_connection::ParseError),
 
     #[cfg(target_os = "windows")]
-    #[error("Failed to send X server request")]
-    WindowsError(#[from] std::io::Error),
+    #[error("{0}")]
+    WindowsError(#[from] windows::core::Error),
+
+    #[error("Image Error : {0}")]
+    ImageError(#[from] image::error::ImageError),
+
+    #[error("{0}")]
+    IoError(#[from] std::io::Error),
+
+    #[error("No valid image found in this directory")]
+    InvalidDirectory,
 }

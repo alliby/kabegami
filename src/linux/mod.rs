@@ -1,10 +1,10 @@
 mod desktop_env;
 pub mod xcb;
 
-use kabegami::{utils, image_utils};
-use kabegami::{PaperMode, PaperSetter};
 use crate::error::Result;
 use desktop_env::DesktopEnv;
+use kabegami::{image_utils, utils};
+use kabegami::{PaperMode, PaperSetter};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -17,11 +17,10 @@ pub fn run_script<P: AsRef<Path>>(script_path: P, wallpaper_path: P) -> Result<(
         .status()?;
     match command_status.code() {
         Some(code) => println!("Exited with status code: {code}"),
-        None => println!("Process terminated by signal")
+        None => println!("Process terminated by signal"),
     }
     Ok(())
 }
-
 
 /// The Linux struct, used for setting the background on Linux systems.
 pub struct LinuxSetter {
@@ -32,7 +31,7 @@ pub struct LinuxSetter {
     /// The wallpaper mode
     wallpaper_mode: PaperMode,
     /// The config path
-    config_path: PathBuf
+    config_path: PathBuf,
 }
 
 impl LinuxSetter {
@@ -42,7 +41,7 @@ impl LinuxSetter {
             current_desktop: DesktopEnv::get_current(),
             wallpaper_path,
             wallpaper_mode,
-            config_path: utils::config_dir()
+            config_path: utils::config_dir(),
         }
     }
 
@@ -56,7 +55,12 @@ impl LinuxSetter {
                 std::fs::write(&script_path, script_content)?;
             }
         }
-        image_utils::save_image(&self.wallpaper_path, &resized_image_path, self.wallpaper_mode, screen_dimensions)?;
+        image_utils::save_image(
+            &self.wallpaper_path,
+            &resized_image_path,
+            self.wallpaper_mode,
+            screen_dimensions,
+        )?;
         run_script(script_path, resized_image_path)
     }
 
@@ -73,7 +77,9 @@ impl PaperSetter for LinuxSetter {
     /// and the `setter.sh` file not exists in the config dir
     fn set_wallpaper(wallpaper_path: PathBuf, mode: PaperMode) -> Result<()> {
         let setter = Self::new(wallpaper_path, mode);
-        let script_path = setter.config_path.join(setter.current_desktop.script_filename());
+        let script_path = setter
+            .config_path
+            .join(setter.current_desktop.script_filename());
         match (script_path.exists(), &setter.current_desktop) {
             (false, DesktopEnv::Other) => setter.set_with_xcb(),
             _ => setter.set_with_script(script_path),

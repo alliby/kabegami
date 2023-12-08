@@ -1,7 +1,7 @@
-use kabegami::{PaperMode, PaperSetter};
-use kabegami::error;
-use std::path::PathBuf;
 use argh::FromArgs;
+use kabegami::error;
+use kabegami::{PaperMode, PaperSetter};
+use std::path::PathBuf;
 
 #[cfg(target_os = "linux")]
 mod linux;

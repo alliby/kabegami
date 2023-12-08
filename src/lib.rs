@@ -1,11 +1,11 @@
-pub mod utils;
-pub mod image_utils;
 pub mod error;
+pub mod image_utils;
+pub mod utils;
 
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
-use std::path::{Path, PathBuf};
 use std::io::Read;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum PaperMode {

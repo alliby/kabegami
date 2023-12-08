@@ -29,7 +29,7 @@ pub enum PlatformError {
     #[cfg(target_os = "windows")]
     #[error("{0}")]
     WindowsError(#[from] windows::core::Error),
-    
+
     #[error("Image Error : {0}")]
     ImageError(#[from] image::error::ImageError),
 

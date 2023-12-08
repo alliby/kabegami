@@ -2,6 +2,7 @@ mod image_parser;
 
 use kabegami::error::Result;
 use kabegami::PaperMode;
+use std::path::Path;
 use x11rb::connection::Connection;
 use x11rb::image::Image;
 use x11rb::protocol::xproto::{
@@ -9,7 +10,6 @@ use x11rb::protocol::xproto::{
     Rectangle, Screen,
 };
 use x11rb::wrapper::ConnectionExt as _;
-use std::path::Path;
 
 x11rb::atom_manager! {
     Atoms: AtomsCookie {

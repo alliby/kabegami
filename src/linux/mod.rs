@@ -27,23 +27,28 @@ pub fn run_script<P: AsRef<Path>>(script_path: P, wallpaper_path: P) -> Result<(
 pub struct LinuxSetter {
     /// The current desktop environment.
     current_desktop: DesktopEnv,
-    /// The configuration path for the current desktop environment.
-    config_path: PathBuf,
+    /// The wallpaper path
+    wallpaper_path: PathBuf,
+    /// The wallpaper mode
+    wallpaper_mode: PaperMode,
+    /// The config path
+    config_path: PathBuf
 }
 
 impl LinuxSetter {
     /// New instance of LinuxSetter with default values
-    pub fn new() -> Self {
+    pub fn new(wallpaper_path: PathBuf, wallpaper_mode: PaperMode) -> Self {
         Self {
             current_desktop: DesktopEnv::get_current(),
-            config_path: utils::config_dir(),
+            wallpaper_path,
+            wallpaper_mode,
+            config_path: utils::config_dir()
         }
     }
 
     /// Sets the background using shell commands.
-    pub fn set_with_script(&self, wallpaper_path: PathBuf, mode: PaperMode) -> Result<()> {
+    pub fn set_with_script(&self, script_path: PathBuf) -> Result<()> {
         let resized_image_path = self.config_path.join(DEFAULT_WALLPAPER_NAME);
-        let script_path = self.config_path.join(self.current_desktop.script_filename());
         let screen_dimensions = xcb::screen_dimensions()?;
         if !script_path.exists() {
             utils::create_dir(&self.config_path)?;

@@ -56,8 +56,13 @@ impl LinuxSetter {
                 std::fs::write(&script_path, script_content)?;
             }
         }
-        image_utils::save_image(&wallpaper_path, &resized_image_path, mode, screen_dimensions)?;
+        image_utils::save_image(&self.wallpaper_path, &resized_image_path, self.wallpaper_mode, screen_dimensions)?;
         run_script(script_path, resized_image_path)
+    }
+
+    /// Sets with XCB
+    pub fn set_with_xcb(&self) -> Result<()> {
+        xcb::set_wallpaper(&self.wallpaper_path, self.wallpaper_mode)
     }
 }
 
@@ -67,10 +72,11 @@ impl PaperSetter for LinuxSetter {
     /// and execut it, It use XCB Library instead if the current desktop not supported
     /// and the `setter.sh` file not exists in the config dir
     fn set_wallpaper(wallpaper_path: PathBuf, mode: PaperMode) -> Result<()> {
-        let env = Self::new();
-        match (env.config_path.exists(), &env.current_desktop) {
-            (false, DesktopEnv::Other) => xcb::set_wallpaper(wallpaper_path, mode),
-            _ => env.set_with_script(wallpaper_path, mode),
+        let setter = Self::new(wallpaper_path, mode);
+        let script_path = setter.config_path.join(setter.current_desktop.script_filename());
+        match (script_path.exists(), &setter.current_desktop) {
+            (false, DesktopEnv::Other) => setter.set_with_xcb(),
+            _ => setter.set_with_script(script_path),
         }
     }
 }

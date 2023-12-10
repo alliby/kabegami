@@ -1,7 +1,7 @@
 use image::Rgb;
-use kabegami::error;
-use kabegami::image_utils;
-use kabegami::PaperMode;
+use crate::error;
+use crate::image_utils;
+use crate::PaperMode;
 use std::path::Path;
 use x11rb::image::{BitsPerPixel, Image, ImageOrder, ScanlinePad};
 use x11rb::protocol::xproto::Screen;

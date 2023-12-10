@@ -1,7 +1,7 @@
 mod image_parser;
 
-use kabegami::error::Result;
-use kabegami::PaperMode;
+use crate::error::Result;
+use crate::PaperMode;
 use std::path::Path;
 use x11rb::connection::Connection;
 use x11rb::image::Image;

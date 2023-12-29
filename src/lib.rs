@@ -25,7 +25,7 @@ pub enum PaperMode {
 }
 
 // Check if a file is a valid image file
-fn is_image<P: AsRef<Path>>(path: P) -> bool {
+fn is_image(path: &PathBuf) -> bool {
     let mut buff = [0; 4];
     std::fs::File::open(path)
         .and_then(|mut file| file.read_exact(&mut buff))
@@ -45,7 +45,7 @@ pub trait PaperSetter {
     ) -> error::Result<()> {
         let mut rng = thread_rng();
         let random_path = paths_list
-            .filter(|path| is_image(path))
+            .filter(is_image)
             .choose(&mut rng)
             .ok_or(error::PlatformError::InvalidDirectory)?;
         Self::set_wallpaper(random_path, mode)

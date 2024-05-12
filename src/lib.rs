@@ -8,7 +8,7 @@ pub mod xcb;
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
 use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub enum PaperMode {

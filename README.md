@@ -28,15 +28,17 @@ cargo install kabegami
 ## Usage
 
 ```
-Usage: kabegami [OPTIONS] <PATH>
+Usage: kabegami [<PATH>] [--mode <mode>] [-V]
 
-Positional arguments:
-  PATH                  the path to the images directory or image file
+Simple Background Setter
+
+Positional Arguments:
+  PATH              the path to the images directory or image file
 
 Options:
-  -h, --help            display this help and exit
-  -m, --mode MODE       default mode: strim, available modes: strim, stretch, fill
-
+  --mode            default mode: strim, available modes: strim, stretch, fill
+  -V, --version     print version info
+  --help            display usage information
 ```
 
 ## Contributing

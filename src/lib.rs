@@ -5,6 +5,9 @@ pub mod utils;
 #[cfg(target_os = "linux")]
 pub mod xcb;
 
+#[cfg(target_os = "windows")]
+pub mod win32;
+
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
 use std::io::Read;

@@ -16,3 +16,12 @@ pub fn create_dir<P: AsRef<Path>>(dir_path: P) -> io::Result<()> {
     }
     fs::create_dir_all(dir_path)
 }
+
+// TODO : Add support for multiple monitor
+#![cfg(target_os = "linux")]
+pub fn screen_dimensions() -> Result<(u32, u32)> {
+    let (conn, screen_num) = x11rb::connect(None)?;
+    let screen = &conn.setup().roots[screen_num];
+    Ok((screen.width_in_pixels as _, screen.height_in_pixels as _))
+}
+

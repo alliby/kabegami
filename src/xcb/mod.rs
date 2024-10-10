@@ -77,13 +77,6 @@ fn create_root_pixmap(
     Ok((pixmap, gc))
 }
 
-// TODO : Add support for multiple monitor
-pub fn screen_dimensions() -> Result<(u32, u32)> {
-    let (conn, screen_num) = x11rb::connect(None)?;
-    let screen = &conn.setup().roots[screen_num];
-    Ok((screen.width_in_pixels as _, screen.height_in_pixels as _))
-}
-
 pub fn set_wallpaper<P: AsRef<Path>>(wallpaper_path: P, mode: PaperMode) -> Result<()> {
     let (conn, screen_num) = x11rb::connect(None)?;
     let screen = &conn.setup().roots[screen_num];

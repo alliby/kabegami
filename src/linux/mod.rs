@@ -48,7 +48,7 @@ impl LinuxSetter {
     /// Sets the background using shell commands.
     pub fn set_with_script(&self, script_path: PathBuf) -> Result<()> {
         let resized_image_path = self.config_path.join(DEFAULT_WALLPAPER_NAME);
-        let screen_dimensions = xcb::screen_dimensions()?;
+        let screen_dimensions = utils::screen_dimensions()?;
         if !script_path.exists() {
             utils::create_dir(&self.config_path)?;
             if let Some(script_content) = self.current_desktop.script_content() {

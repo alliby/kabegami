@@ -1,6 +1,5 @@
 pub mod error;
 pub mod image_utils;
-pub mod utils;
 
 #[cfg(target_os = "linux")]
 pub mod xcb;

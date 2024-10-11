@@ -1,3 +1,5 @@
+pub mod utils;
+
 use argh::FromArgs;
 use kabegami::error;
 use kabegami::{PaperMode, PaperSetter};

@@ -1,3 +1,5 @@
+pub mod utils;
+
 use argh::FromArgs;
 use kabegami::error;
 use kabegami::{PaperMode, PaperSetter};
@@ -8,6 +10,12 @@ mod linux;
 
 #[cfg(target_os = "linux")]
 use linux::LinuxSetter as PlatformSetter;
+
+#[cfg(target_os = "windows")]
+mod windows;
+
+#[cfg(target_os = "windows")]
+use windows::WindowsSetter as PlatformSetter;
 
 const PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -36,13 +44,6 @@ pub struct Cli {
     pub version: bool,
 }
 
-fn read_dir(path: PathBuf) -> error::Result<impl Iterator<Item = PathBuf>> {
-    Ok(path
-        .read_dir()?
-        .filter_map(|entry_result| entry_result.ok())
-        .map(|dir_entry| dir_entry.path()))
-}
-
 fn run() -> error::Result<()> {
     let cli: Cli = argh::from_env();
     if cli.version {
@@ -56,7 +57,7 @@ fn run() -> error::Result<()> {
     let mode = cli.mode;
     
     if path.is_dir() {
-        let dir_paths = read_dir(path)?;
+        let dir_paths = utils::read_dir(path)?;
         PlatformSetter::set_random_wallpaper(dir_paths, mode)
     } else {
         PlatformSetter::set_wallpaper(path, mode)

@@ -1,10 +1,10 @@
 mod desktop_env;
 
-use crate::error::Result;
+use crate::utils;
 use desktop_env::DesktopEnv;
-use kabegami::{image_utils, utils};
+use kabegami::error::Result;
+use kabegami::{image_utils, xcb};
 use kabegami::{PaperMode, PaperSetter};
-use kabegami::xcb;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 

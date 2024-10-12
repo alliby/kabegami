@@ -55,10 +55,9 @@ pub fn screen_dimensions() -> error::Result<(u32, u32)> {
             &mut dev_mode as *mut _,
         ).ok()?;
 
-        // EDID stores the size in centimeters, convert to inches
-        let width_inches = dev_mode.dmPelsWidth;
-        let height_inches = dev_mode.dmPelsHeight;
+        let width = dev_mode.dmPelsWidth;
+        let height = dev_mode.dmPelsHeight;
 
-        Ok((width_inches, height_inches))
+        Ok((width, height))
     }
 }

@@ -30,6 +30,8 @@ pub fn read_dir(path: PathBuf) -> error::Result<impl Iterator<Item = PathBuf>> {
 // TODO : Add support for multiple monitor
 #[cfg(target_os = "linux")]
 pub fn screen_dimensions() -> error::Result<(u32, u32)> {
+    use x11rb::connection::Connection;
+
     let (conn, screen_num) = x11rb::connect(None)?;
     let screen = &conn.setup().roots[screen_num];
     Ok((screen.width_in_pixels as _, screen.height_in_pixels as _))

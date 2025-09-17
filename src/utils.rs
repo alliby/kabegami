@@ -3,8 +3,6 @@ use directories::BaseDirs;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
-use x11rb::connection::Connection;
-
 const CONFIG_DIR_NAME: &str = "kabegami";
 
 pub fn config_dir() -> PathBuf {
